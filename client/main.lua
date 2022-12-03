@@ -251,6 +251,10 @@ Citizen.CreateThread(function()
                     PromptSetActiveGroupThisFrame(WorkGroup, getWork)
                     if PromptHasHoldModeCompleted(GetWorkPrompt)  then
                         --print('I get work')
+                     
+                        ClearPedTasksImmediately(pedOnStation)
+                        SetEntityAsNoLongerNeeded(pedOnStation)
+                        Citizen.Wait(700)
                         getJobAction = true
                         TriggerServerEvent('firsJob:server:getJob')
                         Citizen.Wait(700)
@@ -306,8 +310,8 @@ Citizen.CreateThread(function()
                 --local message = 'Нажмите [~r~Space~q~], что бы налить воду в бочку'
                 local message = 'Наполните бочку водой'
                 DrawTxt(message, 0.9, 0.3, 0.4, 0.4, true, 255, 255, 255, 255, true)
-                local message = 'Осталось '..buckets..' ведер'
-                DrawTxt(message, 1.3, 0.3, 0.4, 0.4, true, 255, 255, 255, 255, true)
+                local message2 = 'Осталось '..buckets..' ведер'
+                DrawTxt(message2, 0.9, 0.35, 0.3, 0.3, true, 255, 255, 255, 255, true)
                 --DrawText3D(newcoords.x, newcoords.y, newcoords.z, message)
                 --print('onLake', onLake,  'dist_to_place', dist_to_place)
                 

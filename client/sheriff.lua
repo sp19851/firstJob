@@ -31,10 +31,12 @@ local GetMissionPrompt
 
 
 function ClearMis()
+    inRoute = false
     ClearPedTasksImmediately(doctor)
     SetEntityAsNoLongerNeeded(doctor)
     DeleteEntity(sheriff_horse)
     DeleteEntity(sheriff)
+    Wait(15500)
     DeleteEntity(doctor)
     sheriff_horse = nil
     sheriff = nil
@@ -44,6 +46,22 @@ function ClearMis()
     VORPcore.instancePlayers(0) 
 end
 
+local function finishMis()
+    local time = GetGameTimer() 
+    while (time + 15000) >= GetGameTimer()  do
+        local message = 'Спасибо за важные сведения, приятель!'
+        DrawTxt(message, 0.50, 0.83, 0.4, 0.4, true, 255, 255, 255, 255, true)
+        local message = 'Кольт и мерина оставь себе - заслужил.'
+        DrawTxt(message, 0.50, 0.87, 0.3, 0.3, true, 255, 255, 255, 255, true)
+        local message = 'И да, не шали тут. Учти, я и мои парни за тобой будут присматривать. Давай, удачи тебе!'
+        DrawTxt(message, 0.50, 0.89, 0.3, 0.3, true, 255, 255, 255, 255, true)
+        Wait(0)
+    end
+
+    TriggerEvent("c_notify_client_new", 'Вы успели передать важную информацию. Миссия успешно завершена.', 'success', 7000)
+    TriggerEvent("c_notify_client_new", 'Осмотритесь', 'success', 10000)
+    ClearMis()
+end
 
 local function GetMissionPromptF()
     
@@ -137,13 +155,19 @@ Citizen.CreateThread(function()
             if dist_to_tumbleweed >= 20.0 then
                 DrawTxt(Config.locations["tumbleweed"].notifText, 0.9, 0.3, 0.4, 0.4, true, 255, 255, 255, 255, true)
             elseif dist_to_tumbleweed < 20.0 and dist_to_tumbleweed >= 5.0 then
+                textureDict, textureName =  Citizen.InvokeNative(0x2A32FAA57B937173,0x07DCE236,tumbleweedPos.x,tumbleweedPos.y,tumbleweedPos.z-0.9, 0, 0, 0, 0, 0, 0, 3.5, 3.5, 3.5, 255,255,51, 250, 0, 0, 2, 0, 0, true, 0)
+
                 DrawTxt(Config.locations["tumbleweed"].notifText2, 0.9, 0.3, 0.4, 0.4, true, 255, 255, 255, 255, true)
             elseif dist_to_tumbleweed < 5.0  then
+                textureDict, textureName =  Citizen.InvokeNative(0x2A32FAA57B937173,0x07DCE236,tumbleweedPos.x,tumbleweedPos.y,tumbleweedPos.z-0.9, 0, 0, 0, 0, 0, 0, 3.5, 3.5, 3.5, 255,255,51, 250, 0, 0, 2, 0, 0, true, 0)
                 DrawTxt('Нажмите [~r~Space~q~] для завершения миссии', 0.50, 0.87, 0.4, 0.4, true, 255, 255, 255, 255, true)
                 if IsControlJustReleased(0, keys["SPACEBAR"]) then
-                    TriggerEvent("c_notify_client_new", 'Вы успели передать важную информацию. Миссия успешно завершена.', 'success', 7000)
-                    TriggerEvent("c_notify_client_new", 'Осмотритесь', 'success', 10000)
-                    ClearMis()
+                    if not IsPedOnMount(PlayerPedId()) then
+                        finishMis()
+                    else
+                        TriggerEvent("c_notify_client_new", 'Слезь с лошади!', 'error', 3500)
+
+                    end
                 end
             end
 
